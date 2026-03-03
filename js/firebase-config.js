@@ -5,16 +5,14 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-aut
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
+  apiKey: "AIzaSyA5aJDFHXfgqFrLhvYUMrCwNY7BFB6T6Mo",
+  authDomain: "magizh-trust-lms.firebaseapp.com",
+  projectId: "magizh-trust-lms",
+  storageBucket: "magizh-trust-lms.firebasestorage.app",
+  messagingSenderId: "728154940194",
+  appId: "1:728154940194:web:8d530bdd61bc984285bb7b",
+  measurementId: "G-J18D326HV5"
 };
-
-const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getDatabase(app);
