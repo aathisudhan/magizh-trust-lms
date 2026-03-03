@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="center-card">
+    <h1>Empowering the Future</h1>
+    <p>Magizh Trust LMS for Grades 6-12</p>
+    <div class="btn-group">
+        <a href="{{ url_for('login') }}" class="primary-btn">Get Started</a>
+        <a href="{{ url_for('register') }}" class="secondary-btn">Register</a>
+    </div>
+</div>
+{% endblock %}
