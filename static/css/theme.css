@@ -1,3 +1,4 @@
+/* Google Design System Variables */
 :root {
     --google-blue: #1a73e8;
     --google-red: #ea4335;
@@ -10,18 +11,20 @@
     --border-color: #dadce0;
     --shadow-sm: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 }
 
 * {
     box-sizing: border-box;
-    font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
     margin: 0;
     padding: 0;
 }
 
 body {
+    font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
     background-color: var(--bg-light);
     color: var(--text-main);
+    line-height: 1.5;
     overflow-x: hidden;
 }
 
@@ -40,13 +43,25 @@ body {
 .animated-bg::after {
     content: "";
     position: absolute;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(26, 115, 232, 0.05) 0%, transparent 50%);
-    animation: rotate 20s linear infinite;
+    top: 50%;
+    left: 50%;
+    width: 200vmax;
+    height: 200vmax;
+    background: radial-gradient(circle, rgba(26, 115, 232, 0.04) 0%, transparent 60%);
+    animation: rotate 30s linear infinite;
 }
 
 @keyframes rotate {
     from { transform: translate(-50%, -50%) rotate(0deg); }
     to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Utility Animations */
+.fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
