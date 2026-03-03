@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-grid">
+    <div class="sidebar">
+        <h3>Welcome, {{ session['user']['role'] }}</h3>
+    </div>
+    <div class="main-panel">
+        <h2>My Lessons</h2>
+        <div id="materials-container">
+            </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+{% endblock %}
