@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Student Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<h3>Your Assignments</h3>
+<div id="assignments"></div>
+
+<h3>Chat</h3>
+<div id="chatBox" class="chat-box"></div>
+<input type="text" id="msg">
+<button onclick="sendMessage()">Send</button>
+
+<script type="module">
+import { auth } from "./js/firebase-config.js";
+import { signOut }
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+window.logout = () => signOut(auth).then(()=>window.location="index.html");
+</script>
+
+<script type="module" src="js/student.js"></script>
+<script type="module" src="js/chat.js"></script>
+
+</body>
+</html>
