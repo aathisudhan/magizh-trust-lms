@@ -1,36 +1,196 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="auth-card">
-    <h2>Create Account</h2>
-    <form id="registerForm">
-        <input type="text" id="username" placeholder="Full Name" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password (Min 6 chars)" required>
-        
-        <select id="role" class="role-select">
-            <option value="student">Student</option>
-            <option value="mentor">Mentor</option>
-        </select>
-        
-        <button type="submit" class="primary-btn">Register</button>
-    </form>
-    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+<div class="auth-wrapper fade-in-up">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="google-logo-dots">
+                <span class="dot blue"></span>
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <h2>Create account</h2>
+            <p>Join the Magizh Trust Learning Community</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="input-row">
+                <div class="input-group">
+                    <input type="text" id="username" placeholder="Full Name" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email" required autocomplete="email">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <input type="password" id="password" placeholder="Password (Min 6 chars)" required autocomplete="new-password">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="role" class="select-label">I am joining as a:</label>
+                <select id="role" class="google-select">
+                    <option value="student">Student</option>
+                    <option value="mentor">Mentor</option>
+                </select>
+            </div>
+            
+            <div class="auth-footer">
+                <a href="{{ url_for('login') }}" class="text-link">Sign in instead</a>
+                <button type="submit" id="regBtn" class="primary-btn ripple">
+                    <span class="btn-text">Register</span>
+                    <div class="spinner-small hidden"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div id="regError" class="error-toast hidden"></div>
 </div>
+
+<style>
+    /* Reuse Login Wrapper Styles */
+    .auth-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 20px;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 450px;
+        padding: 40px;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    }
+
+    .auth-header h2 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #202124;
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .auth-header p {
+        font-size: 16px;
+        color: #5f6368;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .select-label {
+        display: block;
+        font-size: 14px;
+        color: #5f6368;
+        margin-bottom: 5px;
+        margin-left: 5px;
+    }
+
+    .google-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        background: #fff;
+        font-size: 15px;
+        color: #202124;
+        cursor: pointer;
+    }
+
+    input {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border 0.2s;
+    }
+
+    input:focus, .google-select:focus {
+        border-color: #1a73e8;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
+    }
+
+    .auth-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+    }
+
+    .text-link {
+        color: #1a73e8;
+        font-weight: 500;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .error-toast {
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: #d93025;
+        color: white;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .hidden { display: none; }
+
+    /* Loading Spinner */
+    .spinner-small {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top: 2px solid #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
 
 <script>
     document.getElementById('registerForm').onsubmit = async (e) => {
         e.preventDefault();
+        
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const role = document.getElementById('role').value;
+        
+        const regBtn = document.getElementById('regBtn');
+        const btnText = regBtn.querySelector('.btn-text');
+        const spinner = regBtn.querySelector('.spinner-small');
+        const errorBox = document.getElementById('regError');
+
+        // UI Feedback
+        regBtn.disabled = true;
+        btnText.classList.add('hidden');
+        spinner.classList.remove('hidden');
+        errorBox.classList.add('hidden');
 
         try {
-            // 1. Create user in Firebase Auth
+            // 1. Firebase Auth Creation
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
             const idToken = await userCredential.user.getIdToken();
 
-            // 2. Send data to Flask to set up the profile/database
+            // 2. Sync with Backend
             const response = await fetch('/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -43,11 +203,16 @@
 
             const data = await response.json();
             if (data.status === 'success') {
-                alert("Registration Successful!");
-                window.location.href = '/login';
+                window.location.href = '/login?registered=true';
+            } else {
+                throw new Error(data.message);
             }
         } catch (error) {
-            alert("Registration Failed: " + error.message);
+            regBtn.disabled = false;
+            btnText.classList.remove('hidden');
+            spinner.classList.add('hidden');
+            errorBox.textContent = error.message;
+            errorBox.classList.remove('hidden');
         }
     };
 </script>
