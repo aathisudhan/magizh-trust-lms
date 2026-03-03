@@ -15,8 +15,12 @@ def login():
         user_data = db.reference(f'users/{uid}').get()
         role = user_data.get('role', 'student') if user_data else 'student'
         
-        # Set Server-Side Session
-        session['user'] = {'uid': uid, 'role': role, 'email': decoded_token['email']}
+        # Set Server-Side Session for RBAC
+        session['user'] = {
+            'uid': uid, 
+            'role': role, 
+            'email': decoded_token['email']
+        }
         
         return jsonify({"status": "success", "role": role})
     except Exception as e:
@@ -26,7 +30,8 @@ def login():
 def register():
     data = request.json
     try:
-        decoded_token = auth.verify_id_token(data['idToken'])
+        id_token = data.get('idToken')
+        decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
         
         # Create profile in Database
