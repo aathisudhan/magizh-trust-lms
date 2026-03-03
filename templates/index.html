@@ -1,11 +1,122 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="center-card">
-    <h1>Empowering the Future</h1>
-    <p>Magizh Trust LMS for Grades 6-12</p>
-    <div class="btn-group">
-        <a href="{{ url_for('login') }}" class="primary-btn">Get Started</a>
-        <a href="{{ url_for('register') }}" class="secondary-btn">Register</a>
+<div class="hero-section">
+    <div class="center-card landing-container">
+        <div class="logo-animation">
+            <div class="circle blue"></div>
+            <div class="circle red"></div>
+            <div class="circle yellow"></div>
+            <div class="circle green"></div>
+        </div>
+
+        <h1 class="fade-in-up">Empowering the Future</h1>
+        <p class="fade-in-up delay-1">The Digital Learning Hub for Magizh Trust Students (Grades 6-12)</p>
+        
+        <div class="btn-group fade-in-up delay-2">
+            <a href="{{ url_for('login') }}" class="primary-btn ripple">Get Started</a>
+            <a href="{{ url_for('register') }}" class="secondary-btn ripple">Create Account</a>
+        </div>
+
+        <div class="features-grid fade-in-up delay-3">
+            <div class="feature">
+                <span class="icon">📚</span>
+                <h4>Smart Lessons</h4>
+            </div>
+            <div class="feature">
+                <span class="icon">👨‍🏫</span>
+                <h4>Expert Mentors</h4>
+            </div>
+            <div class="feature">
+                <span class="icon">🚀</span>
+                <h4>Skill Growth</h4>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    /* Specific Styles for Index Page Animations */
+    .landing-container {
+        text-align: center;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 60px 40px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, #1a73e8, #34a853);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin: 30px 0;
+    }
+
+    /* Staggered Animations */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.4s; }
+    .delay-3 { animation-delay: 0.6s; }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Google Color Dots Animation */
+    .logo-animation {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .circle {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        animation: bounce 1.5s infinite ease-in-out;
+    }
+    .blue { background: #1a73e8; animation-delay: 0s; }
+    .red { background: #ea4335; animation-delay: 0.1s; }
+    .yellow { background: #fbbc04; animation-delay: 0.2s; }
+    .green { background: #34a853; animation-delay: 0.3s; }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 50px;
+        border-top: 1px solid #eee;
+        padding-top: 30px;
+    }
+
+    .feature h4 {
+        font-size: 0.9rem;
+        color: #5f6368;
+        margin-top: 10px;
+    }
+</style>
 {% endblock %}
