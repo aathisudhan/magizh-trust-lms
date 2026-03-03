@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mentor Panel</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<h2>Mentor Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<h3>Add Assignment</h3>
+<input type="text" id="title" placeholder="Title">
+<textarea id="desc" placeholder="Description"></textarea>
+<button onclick="addAssignment()">Add</button>
+
+<h3>Students</h3>
+<div id="students"></div>
+
+<script type="module">
+import { auth } from "./js/firebase-config.js";
+import { signOut }
+from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+window.logout = () => signOut(auth).then(()=>window.location="index.html");
+</script>
+
+<script type="module" src="js/mentor.js"></script>
+
+</body>
+</html>
