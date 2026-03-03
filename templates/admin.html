@@ -1,23 +1,211 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="admin-panel">
-    <h1>System Administration</h1>
-    <div class="stats-row">
-        <div class="stat-card">Users: <span id="userCount">0</span></div>
-        <div class="stat-card">Active Courses: <span id="courseCount">0</span></div>
+<div class="admin-container fade-in-up">
+    <header class="admin-header">
+        <div class="header-text">
+            <h1>System Administration</h1>
+            <p>Manage users, roles, and platform activity for Magizh Trust</p>
+        </div>
+        <button class="primary-btn ripple" onclick="openAddUserModal()">+ Add New User</button>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue-bg">👥</div>
+            <div class="stat-info">
+                <h3>Users</h3>
+                <span id="userCount" class="count">0</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green-bg">📖</div>
+            <div class="stat-info">
+                <h3>Active Courses</h3>
+                <span id="courseCount" class="count">0</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon yellow-bg">📝</div>
+            <div class="stat-info">
+                <h3>Submissions</h3>
+                <span id="submissionCount" class="count">0</span>
+            </div>
+        </div>
     </div>
-    
-    <table class="user-table">
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="userTableBody"></tbody>
-    </table>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Registered Members</h3>
+            <input type="text" id="userSearch" placeholder="Search by email..." onkeyup="filterUsers()">
+        </div>
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>User Email</th>
+                    <th>Current Role</th>
+                    <th>Join Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <tr id="loadingRow">
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                        <div class="spinner"></div> Loading Users...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+
+<style>
+    /* Admin Portal Specific Styles */
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .admin-header h1 {
+        font-size: 1.8rem;
+        color: #202124;
+        margin-bottom: 5px;
+    }
+
+    .admin-header p {
+        color: #5f6368;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        padding: 24px;
+        background: #fff;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 20px;
+    }
+
+    .blue-bg { background: #e8f0fe; }
+    .green-bg { background: #e6f4ea; }
+    .yellow-bg { background: #fef7e0; }
+
+    .count {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #202124;
+    }
+
+    /* Table Styling */
+    .table-container {
+        background: #fff;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px;
+        border-bottom: 1px solid #dadce0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .table-header input {
+        width: 300px;
+        margin: 0;
+        padding: 8px 15px;
+        background: #f1f3f4;
+        border: none;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .user-table th {
+        text-align: left;
+        background: #f8f9fa;
+        color: #5f6368;
+        font-weight: 500;
+        padding: 15px 20px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+
+    .user-table td {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        color: #3c4043;
+    }
+
+    .role-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .role-student { background: #e8f0fe; color: #1a73e8; }
+    .role-mentor { background: #e6f4ea; color: #1e8e3e; }
+    .role-admin { background: #fce8e6; color: #d93025; }
+
+    /* Action Buttons */
+    .btn-icon {
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding: 5px;
+        margin-right: 5px;
+        border-radius: 4px;
+        transition: background 0.2s;
+    }
+
+    .btn-icon:hover { background: #f1f3f4; }
+
+    /* Loading Spinner */
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #1a73e8;
+        border-radius: 50%;
+        display: inline-block;
+        animation: spin 1s linear infinite;
+        margin-right: 10px;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+
+<script src="{{ url_for('static', filename='js/admin_portal.js') }}"></script>
 {% endblock %}
