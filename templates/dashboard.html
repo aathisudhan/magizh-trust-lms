@@ -1,14 +1,192 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="dashboard-grid">
-    <div class="sidebar">
-        <h3>Welcome, {{ session['user']['role'] }}</h3>
-    </div>
-    <div class="main-panel">
-        <h2>My Lessons</h2>
-        <div id="materials-container">
+<div class="dashboard-wrapper fade-in-up">
+    <aside class="dashboard-sidebar">
+        <div class="user-profile-section">
+            <div class="avatar-circle">
+                {{ session['user']['email'][0] | upper }}
             </div>
-    </div>
+            <div class="user-info">
+                <h4>{{ session['user']['email'].split('@')[0] }}</h4>
+                <span class="role-tag">{{ session['user']['role'] }}</span>
+            </div>
+        </div>
+
+        <nav class="side-nav">
+            <a href="#" class="nav-item active">
+                <span class="icon">📖</span> My Lessons
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">📝</span> Assignments
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">📈</span> Progress
+            </a>
+            <a href="#" class="nav-item">
+                <span class="icon">💬</span> Mentor Chat
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-panel">
+        <header class="panel-header">
+            <div class="greeting">
+                <h2>Learning Path</h2>
+                <p>Pick up where you left off today.</p>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="courseSearch" placeholder="Search lessons..." onkeyup="searchMaterials()">
+            </div>
+        </header>
+
+        <div id="materials-container" class="materials-grid">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+        </div>
+    </main>
 </div>
-<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+
+<style>
+    .dashboard-wrapper {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    /* Sidebar Styling */
+    .dashboard-sidebar {
+        background: white;
+        border: 1px solid #dadce0;
+        border-radius: 12px;
+        padding: 24px;
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+    }
+
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        background: #1a73e8;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .role-tag {
+        background: #e8f0fe;
+        color: #1a73e8;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .side-nav {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        text-decoration: none;
+        color: #5f6368;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+        background: #f1f3f4;
+        color: #1a73e8;
+    }
+
+    /* Main Panel & Grid */
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 30px;
+    }
+
+    .materials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    /* Material Cards */
+    .material-card {
+        background: white;
+        border: 1px solid #dadce0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+
+    .material-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .card-thumb {
+        height: 160px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+
+    .card-content h4 {
+        margin-bottom: 8px;
+        color: #202124;
+    }
+
+    .card-content p {
+        font-size: 0.9rem;
+        color: #5f6368;
+        line-height: 1.4;
+    }
+
+    /* Skeleton Loading Animation */
+    .skeleton-card {
+        height: 280px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 12px;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    @media (max-width: 900px) {
+        .dashboard-wrapper { grid-template-columns: 1fr; }
+        .dashboard-sidebar { position: relative; top: 0; }
+    }
+</style>
+
+
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
