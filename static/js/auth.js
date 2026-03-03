@@ -1,17 +1,28 @@
+/**
+ * Auth Logic: Handles Login/Logout and Session Sync
+ */
 const authHandler = {
-    // Helper to send tokens to Flask
     async syncWithBackend(endpoint, idToken, extraData = {}) {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken, ...extraData })
-        });
-        return await response.json();
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken, ...extraData })
+            });
+            return await response.json();
+        } catch (error) {
+            console.error("Backend Sync Error:", error);
+            return { status: 'error', message: 'Network error' };
+        }
     }
 };
 
-// Global Logout
 async function logoutUser() {
-    await firebase.auth().signOut();
-    window.location.href = '/logout';
+    try {
+        await firebase.auth().signOut();
+        // Redirect to Flask logout to clear server-side session
+        window.location.href = '/logout';
+    } catch (error) {
+        console.error("Logout Error:", error);
+    }
 }
