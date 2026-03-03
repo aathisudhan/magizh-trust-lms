@@ -1,52 +1,49 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, session, redirect, url_for, render_template
 import firebase_admin
-from firebase_admin import credentials, auth, db
+from firebase_admin import credentials
+import os
+
+# 1. Import your custom config and blueprints
 from config import Config
+from routes.auth_routes import auth_bp
+from routes.user_routes import user_bp
+from routes.lms_routes import lms_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Initialize Firebase Admin SDK
-cred = credentials.Certificate(app.config['FIREBASE_CONFIG'])
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://your-project-default-rtdb.firebaseio.com/'
-})
+# 2. Initialize Firebase Admin SDK (Singleton Pattern)
+# This prevents re-initialization errors on Vercel's serverless environment
+if not firebase_admin._apps:
+    cred = credentials.Certificate(app.config['FIREBASE_CONFIG'])
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': os.environ.get('FIREBASE_DATABASE_URL') 
+    })
 
-# --- ROUTES ---
+# 3. Register Blueprints (The "Connection" Logic)
+# This tells Flask where to find /login, /admin, /student, etc.
+app.register_blueprint(auth_bp)
+app.register_blueprint(user_bp)
+app.register_blueprint(lms_bp)
 
+# 4. Global Routes (Core Pages)
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        # Verify Firebase ID Token sent from frontend
-        id_token = request.json.get('idToken')
-        try:
-            decoded_token = auth.verify_id_token(id_token)
-            uid = decoded_token['uid']
-            
-            # Fetch User Role from Realtime Database
-            user_ref = db.reference(f'users/{uid}').get()
-            session['user'] = {'uid': uid, 'role': user_ref.get('role', 'student')}
-            
-            return jsonify({"status": "success", "role": session['user']['role']})
-        except Exception as e:
-            return jsonify({"status": "error", "message": str(e)}), 401
-    return render_template('login.html')
-
-@app.route('/admin')
-def admin_dashboard():
-    # Role-Based Access Control (RBAC)
-    if session.get('user') and session['user']['role'] == 'admin':
-        return render_template('admin.html')
-    return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+# 5. Error Handlers (Prevents the ugly Vercel 404 page)
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('index.html'), 404
+
+# 6. Vercel Requirement
+# We assign app to 'app' so the Vercel Python runtime finds the WSGI callable
+app = app
 
 if __name__ == '__main__':
     app.run(debug=True)
