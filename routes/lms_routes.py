@@ -1,11 +1,11 @@
-from flask import Blueprint, jsonify, session
+from flask import Blueprint, jsonify, session, request
 from firebase_admin import db
 
 lms_bp = Blueprint('lms', __name__)
 
 @lms_bp.route('/api/materials', methods=['GET'])
 def get_materials():
-    # Only logged-in users can see materials
+    # Security: Only logged-in users can see materials
     if not session.get('user'):
         return jsonify({"error": "Unauthorized"}), 401
         
@@ -14,10 +14,17 @@ def get_materials():
 
 @lms_bp.route('/api/assignments/submit', methods=['POST'])
 def submit_assignment():
-    if session.get('user') and session['user']['role'] == 'student':
-        # Logic to record submission in Firebase
-        uid = session['user']['uid']
-        submission_data = request.json
-        db.reference(f'submissions/{uid}').push(submission_data)
-        return jsonify({"status": "submitted"})
+    user = session.get('user')
+    if user and user['role'] == 'student':
+        try:
+            uid = user['uid']
+            submission_data = request.json
+            # Add timestamp for sorting
+            submission_data['timestamp'] = {".sv": "timestamp"} 
+            
+            db.reference(f'submissions/{uid}').push(submission_data)
+            return jsonify({"status": "submitted"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+            
     return jsonify({"error": "Forbidden"}), 403
